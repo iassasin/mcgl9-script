@@ -69,3 +69,18 @@ clearTimeout(to); // отменить таймаут
 let iv = setInterval(() => display.log('interval'), 1000);
 clearInterval(iv); // отменить интервал
 ```
+
+## './mcgl9/console'
+
+Предоставляет более привычные методы `console.log`, `console.warn`, `console.error`, `console.info`, принимающие несколько аргументов (в отличие от `display.log`)
+
+Пример:
+```ts
+import './mcgl9';
+import console from './mcgl9/console';
+
+console.log(1, 2, 3); // => 1,2,3
+console.info(1, 2, 3); // => [INFO] 1,2,3
+console.warn(1, 2, 3); // => [WARN] 1,2,3
+console.error(1, 2, 3); // => [ERROR] 1,2,3
+```
