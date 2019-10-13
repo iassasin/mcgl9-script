@@ -1,0 +1,16 @@
+{
+	"compilerOptions": {
+		"esModuleInterop": false,
+		"removeComments": true,
+		"module": "es2015",
+		"target": "es5",
+		"allowUnreachableCode": true,
+		"experimentalDecorators": true,
+		"moduleResolution": "node",
+		"outDir": "tmpDist"
+	},
+	"include": [
+		"**/*",
+		"*"
+	]
+}

@@ -1,0 +1,15 @@
+{
+  "devDependencies": {
+    "cross-env": "^6.0.3",
+    "rollup": "^1.23.1",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-typescript": "^1.0.1",
+    "rollup-plugin-uglify": "^6.0.3",
+    "tslib": "^1.10.0",
+    "typescript": "^3.6.4"
+  },
+  "scripts": {
+    "build": "tsc && rollup -c",
+    "build-mini": "tsc && cross-env MINI=1 rollup -c"
+  }
+}
