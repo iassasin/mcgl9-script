@@ -84,3 +84,19 @@ console.info(1, 2, 3); // => [INFO] 1,2,3
 console.warn(1, 2, 3); // => [WARN] 1,2,3
 console.error(1, 2, 3); // => [ERROR] 1,2,3
 ```
+
+## './mcgl9/promise'
+
+Предоставляет простую реализацию промисов для mcgl9, пока без поддержки `Promise.all` и других стандартных методов,
+только `Promise.resolve` и `Promise.reject`
+
+Пример:
+```ts
+import './mcgl9';
+import console from './mcgl9/console';
+import Promise from './mcgl9/promise';
+
+Promise.resolve('Hello')
+	.then(hello => `${hello}, world!`)
+	.then(console.log); // Hello, world!
+```
