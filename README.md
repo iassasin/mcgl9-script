@@ -93,8 +93,8 @@ console.error(1, 2, 3); // => [ERROR] 1,2,3
 Пример:
 ```ts
 import './mcgl9';
+import './mcgl9/promise';
 import console from './mcgl9/console';
-import Promise from './mcgl9/promise';
 
 Promise.resolve('Hello')
 	.then(hello => `${hello}, world!`)
