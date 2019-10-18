@@ -28,17 +28,7 @@ export default class MPromise<T = any> {
 		this.onFulfill((err, val) => {
 			try {
 				cb = err ? cbErr : cb;
-
-				if (cb) {
-					let res = cb(val);
-					if (res instanceof MPromise) {
-						res.onFulfill(promise.fulfill.bind(promise));
-					} else {
-						promise.fulfill(false, res as UnwrappedResult<T2>);
-					}
-				} else {
-					promise.fulfill(err, val as unknown as UnwrappedResult<T2>);
-				}
+				promise.fulfill(cb ? false : err, cb ? cb(val) : val);
 			} catch (e) {
 				promise.fulfill(true, e);
 			}
@@ -47,8 +37,8 @@ export default class MPromise<T = any> {
 		return promise;
 	}
 
-	catch<R = any>(cb: Handler<any, R>): MPromise<UnwrappedResult<R>> {
-		return this.then(void 0, cb);
+	catch<R = any>(cb: Handler<any, R>): MPromise<UnwrappedResult<T|R>> {
+		return this.then<T|R>(void 0, cb);
 	}
 
 	static resolve<T>(v: T) {
@@ -67,8 +57,16 @@ export default class MPromise<T = any> {
 		}
 	}
 
-	private fulfill(err: boolean, val: T) {
+	private fulfill(err: boolean, val: any) {
 		if (this.done) return;
+
+		if (val instanceof MPromise) {
+			if ((val as MPromise) === this) {
+				return this.fulfill(true, new TypeError(`Circular promise fulfill`));
+			}
+
+			return val.onFulfill(this.fulfill.bind(this));
+		}
 
 		this.done = true;
 		this.value = val;
@@ -82,3 +80,5 @@ export default class MPromise<T = any> {
 		this.fulfillCb.forEach(f => f(err, val));
 	}
 }
+
+(Promise as any) = MPromise;
