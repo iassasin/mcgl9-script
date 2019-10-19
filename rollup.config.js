@@ -11,7 +11,11 @@ let plugins = [
 ];
 
 if (mini) {
-  plugins.push(uglify());
+  plugins.push(uglify({
+    compress: {
+      passes: 3,
+    },
+  }));
 }
 
 export default {
