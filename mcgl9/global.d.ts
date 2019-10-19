@@ -1,9 +1,5 @@
 declare var init: () => any;
 declare var update: (time: number) => any;
-declare var mcgl9: {
-	onInit(cb: (...args: any[]) => any);
-	onUpdate(cb: (...args: any[]) => any);
-};
 
 declare var display: DisplayService;
 declare var key: KeyService;

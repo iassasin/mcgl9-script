@@ -1,4 +1,3 @@
-import '../mcgl9';
 import {setInterval} from '../mcgl9/timers';
 import console from '../mcgl9/console';
 

@@ -12,7 +12,12 @@ function applier<T extends Function>(arr: T[]) {
 init = applier(inits);
 update = applier(updates);
 
-mcgl9 = {
-	onInit: inits.push.bind(inits),
-	onUpdate: updates.push.bind(updates),
+export default {
+	onInit(cb: () => any) {
+		inits.push(cb);
+	},
+
+	onUpdate(cb: (time: number) => any) {
+		updates.push(cb);
+	},
 };

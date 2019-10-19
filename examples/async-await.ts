@@ -1,4 +1,3 @@
-import '../mcgl9'; // обязательный импорт
 import '../mcgl9/promise'; // чтобы не ругался typescript, делаем импорт без указания класса
 import console from '../mcgl9/console';
 

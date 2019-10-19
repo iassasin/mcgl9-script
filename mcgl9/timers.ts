@@ -1,4 +1,4 @@
-import '.';
+import mcgl9 from '.';
 
 var timerId = 0;
 var timers = {};
