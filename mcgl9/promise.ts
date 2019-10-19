@@ -1,4 +1,4 @@
-import {setTimeout} from './timers';
+import {queueMicrotask} from './timers';
 
 type Handler<T, R = any> = (val: T) => R;
 type FulfillHandler<T, R = any> = (err: PromiseState, val: T) => R;
@@ -18,13 +18,13 @@ export default class MPromise<T = any> {
 
 	constructor(f?: (resolve: Handler<T>, reject: Handler<any>) => any) {
 		if (f) {
-			setTimeout(() => {
+			queueMicrotask(() => {
 				try {
 					f(this.fulfill.bind(this, PromiseState.FULFILLED), this.fulfill.bind(this, PromiseState.REJECTED));
 				} catch (e) {
 					this.fulfill(PromiseState.REJECTED, e);
 				}
-			}, 0);
+			});
 		}
 	}
 
