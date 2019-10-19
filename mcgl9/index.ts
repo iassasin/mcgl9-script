@@ -1,24 +1,18 @@
-let inits = [];
-let updates = [];
+let inits = [] as Function[];
+let updates = [] as Function[];
 
-init = function() {
-	for (let i in inits) {
-		inits[i].apply(this, arguments);
-	}
-};
+function applier<T extends Function>(arr: T[]) {
+	return function() {
+		for (let i in arr) {
+			arr[i].apply(this, arguments);
+		}
+	};
+}
 
-update = function (time) {
-	for (let i in updates) {
-		updates[i].apply(this, arguments);
-	}
-};
+init = applier(inits);
+update = applier(updates);
 
 mcgl9 = {
-	onInit(cb) {
-		inits.push(cb);
-	},
-
-	onUpdate(cb) {
-		updates.push(cb);
-	},
+	onInit: inits.push.bind(inits),
+	onUpdate: updates.push.bind(updates),
 };
