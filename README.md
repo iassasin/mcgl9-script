@@ -101,3 +101,24 @@ Promise.resolve('Hello')
 	.then(hello => `${hello}, world!`)
 	.then(console.log); // Hello, world!
 ```
+
+## './mcgl9/keyboard'
+
+Упрощение работы с клавиатурными нажатиями.
+
+Пример:
+```ts
+import keyboard from './mcgl9/keyboard';
+
+keyboard.onKeyDown(KeyCode.G, (code: KeyCode) => {
+	// Вызывается один раз при нажатии на клавишу G
+});
+
+keyboard.onKeyUp(KeyCode.G, (code: KeyCode) => {
+	// Вызывается один раз при отпускании клавиши G
+});
+
+keyboard.onKeyHold(KeyCode.G, (code: KeyCode) => {
+	// Вызывается каждый тик onUpdate, пока клавиша G нажата
+});
+```
