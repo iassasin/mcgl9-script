@@ -1,7 +1,13 @@
 import mcgl9 from '.';
 
+interface Timer {
+	interval: null | number;
+	callback: Function;
+	deadline: number;
+}
+
 var timerId = 0;
-var timers = {};
+var timers: { [k: number]: Timer } = {};
 
 function processTimers() {
 	for (let id in timers) {
