@@ -47,14 +47,6 @@ export default class MPromise<T = any> {
 		return this.then<T|R>(void 0, cb);
 	}
 
-	static resolve<T>(v: T) {
-		return new MPromise<T>(res => res(v));
-	}
-
-	static reject(err: any) {
-		return new MPromise((res, rej) => rej(err));
-	}
-
 	private onFulfill(cb: FulfillHandler<T>) {
 		if (this.state !== PromiseState.PENDING) {
 			cb(this.state, this.value);
@@ -67,7 +59,7 @@ export default class MPromise<T = any> {
 		if (this.state !== PromiseState.PENDING) return;
 
 		if (val instanceof MPromise) {
-			if ((val as MPromise) === this) {
+			if (val === this) {
 				return this.fulfill(PromiseState.REJECTED, new TypeError(`Circular promise fulfill`));
 			}
 
@@ -83,6 +75,43 @@ export default class MPromise<T = any> {
 		}
 
 		this.fulfillCb.forEach(f => f(state, val));
+	}
+
+	// static
+
+	static resolve<T>(v: T) {
+		return new MPromise<T>(res => res(v));
+	}
+
+	static reject(err: any) {
+		return new MPromise<never>((res, rej) => rej(err));
+	}
+
+	static all<P>(promises: P[]): MPromise<UnwrappedResult<P>[]> {
+		if (!promises.length) {
+			return MPromise.resolve(promises as UnwrappedResult<P>[]);
+		}
+
+		let results = Array(promises.length);
+		let counter = 0;
+
+		return new MPromise<UnwrappedResult<P>[]>((resolve, reject) => {
+			function addResult(i: number, val: any) {
+				++counter;
+				results[i] = val;
+				if (counter >= results.length) {
+					resolve(results);
+				}
+			}
+
+			(promises as any[]).forEach((promise, i) => {
+				if (promise.then) {
+					promise.then(addResult.bind(0, i), reject);
+				} else {
+					addResult(i, promise);
+				}
+			});
+		});
 	}
 }
 

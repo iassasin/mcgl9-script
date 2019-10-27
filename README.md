@@ -89,8 +89,7 @@ console.error(1, 2, 3); // => [ERROR] 1,2,3
 
 ## './mcgl9/promise'
 
-Предоставляет простую реализацию промисов для mcgl9, пока без поддержки `Promise.all` и других стандартных методов,
-только `Promise.resolve` и `Promise.reject`
+Предоставляет простую реализацию промисов для mcgl9 с поддержкой методов `Promise.resolve`, `Promise.reject` и `Promise.all`
 
 Пример:
 ```ts

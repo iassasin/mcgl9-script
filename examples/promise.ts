@@ -6,7 +6,7 @@ function wait<T>(n: number, v: T) {
 	return new Promise<T>(res => setTimeout(() => res(v), n));
 }
 
-Promise.resolve('1').then(v => {
+let promise = Promise.resolve('1').then(v => {
     console.log('p1', v);
     return wait(500, '2');
 }).then(v => {
@@ -33,3 +33,5 @@ Promise.resolve('1').then(v => {
 }).then(v => {
 	console.log('p10', v);
 });
+
+Promise.all(['promise all: ', promise, 'a2', wait(100, 'a3')]).then(console.log);
