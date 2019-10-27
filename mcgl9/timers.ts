@@ -25,7 +25,7 @@ function processTasks() {
 	}
 
 	while (microtasks.length) {
-		microtasks.shift()();
+		microtasks.pop()();
 	}
 }
 
@@ -41,17 +41,17 @@ export function setTimeout(cb: Function, timeMs: number) {
 	};
 
 	return id;
-};
+}
 
 export function clearTimeout(id: number) {
 	delete timers[id];
-};
+}
 
 export function setInterval(cb: Function, timeMs: number) {
 	var id = setTimeout(cb, timeMs);
 	timers[id].interval = timeMs;
 	return id;
-};
+}
 
 export let clearInterval = clearTimeout;
 
