@@ -7,21 +7,21 @@ function wait<T>(n: number, v: T) {
 }
 
 let promise = Promise.resolve('1').then(v => {
-    console.log('p1', v);
-    return wait(500, '2');
+	console.log('p1', v);
+	return wait(500, '2');
 }).then(v => {
 	console.log('p2', v);
-    return Promise.reject('e1');
+	return Promise.reject('e1');
 }).then(v => {
-    console.log('p3', 'never');
+	console.log('p3', 'never');
 }).catch(err => {
-    console.log('d4', err);
-    return wait(500, 'e2r');
+	console.log('d4', err);
+	return wait(500, 'e2r');
 }).catch(err => {
-    console.log('d5', 'enever');
+	console.log('d5', 'enever');
 }).then(v => {
-    console.log('p6', v);
-    return wait(500, '3');
+	console.log('p6', v);
+	return wait(500, '3');
 }).then(v => {
 	console.log('p7', v);
 	throw 'th1';

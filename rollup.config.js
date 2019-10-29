@@ -15,6 +15,10 @@ if (mini) {
     compress: {
       passes: 3,
     },
+
+    output: {
+      max_line_len: 128,
+    },
   }));
 }
 
