@@ -1,14 +1,18 @@
-// не работает const enum:
-// import typescript from 'rollup-plugin-typescript';
+import typescript from 'rollup-plugin-typescript';
 import resolve from 'rollup-plugin-node-resolve';
 import { uglify } from "rollup-plugin-uglify";
 
 const mini = process.env.MINI === '1';
+const watch = process.env.WATCH === '1';
 
 let plugins = [
-  // typescript(),
   resolve(),
 ];
+
+// не работает const enum, поэтому только для watch-режима
+if (watch) {
+  plugins.push(typescript());
+}
 
 if (mini) {
   plugins.push(uglify({

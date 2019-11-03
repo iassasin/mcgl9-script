@@ -10,6 +10,7 @@
   },
   "scripts": {
     "build": "tsc && rollup -c",
-    "build-mini": "tsc && cross-env MINI=1 rollup -c"
+    "build-mini": "tsc && cross-env MINI=1 rollup -c",
+    "watch": "cross-env WATCH=1 rollup -wc"
   }
 }
