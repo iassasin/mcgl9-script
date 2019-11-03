@@ -27,7 +27,7 @@ if (mini) {
 }
 
 export default {
-  input: 'tmpDist/script.js',
+  input: watch ? 'script.ts' : 'tmpDist/script.js',
   context: 'this',
 
   output: {
