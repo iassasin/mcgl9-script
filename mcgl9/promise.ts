@@ -18,13 +18,11 @@ export default class MPromise<T = any> {
 
 	constructor(f?: (resolve: Handler<T>, reject: Handler<any>) => any) {
 		if (f) {
-			queueMicrotask(() => {
-				try {
-					f(this.fulfill.bind(this, PromiseState.FULFILLED), this.fulfill.bind(this, PromiseState.REJECTED));
-				} catch (e) {
-					this.fulfill(PromiseState.REJECTED, e);
-				}
-			});
+			try {
+				f(this.fulfill.bind(this, PromiseState.FULFILLED), this.fulfill.bind(this, PromiseState.REJECTED));
+			} catch (e) {
+				this.fulfill(PromiseState.REJECTED, e);
+			}
 		}
 	}
 
@@ -56,8 +54,6 @@ export default class MPromise<T = any> {
 	}
 
 	private fulfill(state: PromiseState, val: any) {
-		if (this.state !== PromiseState.PENDING) return;
-
 		if (val instanceof MPromise) {
 			if (val === this) {
 				return this.fulfill(PromiseState.REJECTED, new TypeError(`Circular promise fulfill`));
@@ -66,15 +62,19 @@ export default class MPromise<T = any> {
 			return val.onFulfill(this.fulfill.bind(this));
 		}
 
-		this.state = state;
-		this.value = val;
+		queueMicrotask(() => {
+			if (this.state !== PromiseState.PENDING) return;
 
-		if (state === PromiseState.REJECTED && !this.fulfillCb.length) {
-			display.log(`Unhandled promise rejection!`);
-			display.log(val as unknown as string);
-		}
+			this.state = state;
+			this.value = val;
 
-		this.fulfillCb.forEach(f => f(state, val));
+			if (state === PromiseState.REJECTED && !this.fulfillCb.length) {
+				display.log(`Unhandled promise rejection!`);
+				display.log(val as unknown as string);
+			}
+
+			this.fulfillCb.forEach(f => f(state, val));
+		});
 	}
 
 	// static

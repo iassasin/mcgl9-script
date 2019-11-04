@@ -25,7 +25,7 @@ function processTasks() {
 	}
 
 	while (microtasks.length) {
-		microtasks.pop()();
+		microtasks.shift()();
 	}
 }
 
