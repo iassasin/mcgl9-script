@@ -1,4 +1,4 @@
-import typescript from 'rollup-plugin-typescript';
+import typescript from '@rollup/plugin-typescript';
 import resolve from 'rollup-plugin-node-resolve';
 import { uglify } from "rollup-plugin-uglify";
 
@@ -7,12 +7,8 @@ const watch = process.env.WATCH === '1';
 
 let plugins = [
   resolve(),
+  typescript(),
 ];
-
-// не работает const enum, поэтому только для watch-режима
-if (watch) {
-  plugins.push(typescript());
-}
 
 if (mini) {
   plugins.push(uglify({
@@ -27,7 +23,7 @@ if (mini) {
 }
 
 export default {
-  input: watch ? 'script.ts' : 'tmpDist/script.js',
+  input: 'script.ts',
   context: 'this',
 
   output: {

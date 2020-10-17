@@ -7,7 +7,6 @@
 		"allowUnreachableCode": true,
 		"experimentalDecorators": true,
 		"moduleResolution": "node",
-		"outDir": "tmpDist",
 		"importHelpers": true
 	},
 	"include": [
