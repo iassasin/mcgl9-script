@@ -6,6 +6,7 @@ declare var key: KeyService;
 declare var sound: SoundService;
 declare var color: ColorService;
 declare var user: UserService;
+declare var sys: SysService;
 
 interface DisplayService {
 	/**
@@ -51,6 +52,7 @@ interface DisplayService {
 
 	/**
 	 * вывод текста в консоль (использовать для отладки)
+	 * @deprecated Вскоре будет удалено, использовать `sys.log()`
 	 */
 	log(text: string);
 
@@ -175,6 +177,25 @@ interface UserService {
 	 * (нулевая точка это центр проектора)
 	 */
 	z(): number;
+}
+
+interface SysService {
+	/**
+	 * вывод текста в консоль (использовать для отладки)
+	 */
+	log(text: string);
+
+	/**
+	 * Загружает и выполняет код из указанного файла.
+	 *
+	 * filename - это файл, который ищется от корня папки plugins с добавленным расширением js.
+	 *
+	 * При вызове `sys.use("script/prog")` клиент попытается загрузить скрипт по адресу `{папка репозиториев}/mgclient/plugins/script/prog.js`.
+	 *
+	 * Если указать `@` в начале имени файла, то клиент будет следить за обновлениями этого файла и загружать их автоматически, например:
+	 * `sys.use("@script/prog")`
+	 */
+	use(filename: string);
 }
 
 declare const enum KeyCode {
