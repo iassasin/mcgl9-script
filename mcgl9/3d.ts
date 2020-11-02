@@ -6,7 +6,7 @@ export function vecMultVec(v1: Vector3, v2: Vector3) {
 	return {
 		x: v1.x * v2.x,
 		y: v1.y * v2.y,
-		z: v1.z * v2.z
+		z: v1.z * v2.z,
 	};
 }
 
@@ -14,7 +14,16 @@ export function vecAddVec(v1: Vector3, v2: Vector3) {
 	return {
 		x: v1.x + v2.x,
 		y: v1.y + v2.y,
-		z: v1.z + v2.z
+		z: v1.z + v2.z,
+	};
+}
+
+export function vecNormalize(v: Vector3) {
+	let len = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+	return {
+		x: v.x / len,
+		y: v.y / len,
+		z: v.z / len,
 	};
 }
 
@@ -24,13 +33,7 @@ export interface Vector3 {
 	z: number;
 }
 
-class Transform {
-	position: Vector3;
-	rotation: Vector3;
-	size: number;
-}
-
-class TransformMatrix {
+export class TransformMatrix {
 	/**
 	 * indexes:
 	 * 0  1  2  3
@@ -119,8 +122,6 @@ class TransformMatrix {
 	scale(vec: Vector3) {
 		let originOffset = this.getOffsetFromOrigin();
 
-		vec = this.applyExceptTranslation(vec);
-
 		this.multiply([
 			1, 0, 0, 0,
 			0, 1, 0, 0,
@@ -149,8 +150,7 @@ class TransformMatrix {
 		angle = angle / 360 * 6.283;
 		const cosA = Math.cos(angle);
 		const sinA = Math.sin(angle);
-
-		vec = this.applyExceptTranslation(vec);
+		const iCosA = 1 - cosA;
 
 		let originOffset = this.getOffsetFromOrigin();
 
@@ -161,21 +161,23 @@ class TransformMatrix {
 			-originOffset.x, -originOffset.y, -originOffset.z, 1,
 		]);
 
+		vec = vecNormalize(this.apply(vec));
+
 		// https://en.wikipedia.org/wiki/Rotation_matrix
 		this.multiply([
-			cosA + vec.x * vec.x * (1 - cosA),
-			vec.x * vec.y * (1 - cosA) - vec.z * sinA,
-			vec.x * vec.z * (1 - cosA) + vec.y * sinA,
+			cosA + vec.x * vec.x * iCosA,
+			vec.x * vec.y * iCosA - vec.z * sinA,
+			vec.x * vec.z * iCosA + vec.y * sinA,
 			0,
 
-			vec.y * vec.x * (1 - cosA) + vec.z * sinA,
-			cosA + vec.y * vec.y * (1 - cosA),
-			vec.y * vec.z * (1 - cosA) - vec.x * sinA,
+			vec.y * vec.x * iCosA + vec.z * sinA,
+			cosA + vec.y * vec.y * iCosA,
+			vec.y * vec.z * iCosA - vec.x * sinA,
 			0,
 
-			vec.z * vec.x * (1 - cosA) - vec.y * sinA,
-			vec.z * vec.y * (1 - cosA) + vec.x * sinA,
-			cosA + vec.z * vec.z * (1 - cosA),
+			vec.z * vec.x * iCosA - vec.y * sinA,
+			vec.z * vec.y * iCosA + vec.x * sinA,
+			cosA + vec.z * vec.z * iCosA,
 			0,
 
 			0, 0, 0, 1,
@@ -193,6 +195,7 @@ class TransformMatrix {
 }
 
 interface VoxelProps {
+	position?: Vector3;
 	color?: number;
 	size?: number;
 }
@@ -205,19 +208,19 @@ export class Voxel {
 
 	private voxel: Operation;
 
-	constructor(x: number, y: number, z: number, props?: VoxelProps) {
-		let rprops = {color: color.rgb(255, 0, 0), size: 1};
+	constructor(props?: VoxelProps) {
+		let rprops = {position: vec3(0, 0, 0), color: color.rgb(0, 0, 0), size: 1};
 		if (props) {
 			for (let k in props) {
 				rprops[k] = props[k];
 			}
 		}
 
-		this.position = {x, y, z};
+		this.position = rprops.position;
 		this.color = rprops.color;
 		this.size = rprops.size;
 
-		this.voxel = display.voxel(x, y, z, this.color);
+		this.voxel = display.voxel(rprops.position.x, rprops.position.y, rprops.position.z, this.color);
 	}
 
 	update() {
@@ -240,7 +243,19 @@ export class Voxel {
 }
 
 export class Mesh {
-	static fromTemplate(template: string) {
+	static fromTemplate(template: string, objectFabric?: (point: string, x: number, y: number, mesh: Mesh) => (Mesh | Voxel)) {
+		if (!(objectFabric && objectFabric instanceof Function)) {
+			objectFabric = point => {
+				switch (point) {
+					case '.':
+					case ' ': return null;
+
+					default:
+						return new Voxel();
+				}
+			}
+		}
+
 		let mesh = new Mesh();
 
 		let lines = template.split('\n');
@@ -250,14 +265,16 @@ export class Mesh {
 
 			for (let x = 0; x < line.length; ++x) {
 				let point = line[x];
+				let realY = lines.length - y;
 
-				switch (point) {
-					case '.':
-					case ' ': break;
-					case 'p': mesh.pivot = vec3(x, lines.length - y, 0); break;
+				let obj = objectFabric(point, x, realY, mesh);
+				if (obj) {
+					obj.position = vec3(x, realY, obj.position.z);
+					mesh.addElement(obj);
+				}
 
-					default:
-						mesh.addElement(new Voxel(x, lines.length - y, 0));
+				if (point == 'p') {
+					mesh.pivot = vec3(x, realY, obj && obj.position.z || 0);
 				}
 			}
 		}
@@ -301,10 +318,10 @@ export class Mesh {
 
 		matr
 			.translate(this.position)
-			.scale(this.scale)
 			.rotate(vec3(1, 0, 0), this.rotation.x)
 			.rotate(vec3(0, 1, 0), this.rotation.y)
 			.rotate(vec3(0, 0, 1), this.rotation.z)
+			.scale(this.scale)
 			.translate(vecMultVec(this.pivot, vec3(-1, -1, -1)));
 
 		for (let el of this.elements) {
