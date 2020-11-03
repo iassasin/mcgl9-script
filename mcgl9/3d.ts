@@ -93,10 +93,6 @@ export class TransformMatrix {
 
 	stack = [] as number[][];
 
-	getOffsetFromOrigin(): Vector3 {
-		return vec3(this.matrix[12], this.matrix[13], this.matrix[14]);
-	}
-
 	copy() {
 		let mat = new TransformMatrix();
 		mat.matrix = this.matrix.map(x => x);
@@ -128,23 +124,9 @@ export class TransformMatrix {
 		};
 	}
 
-	applyExceptTranslation(v: Vector3): Vector3 {
-		const m = this.matrix;
-
-		return {
-			x: v.x * m[0] + v.y * m[4] + v.z * m[8],
-			y: v.x * m[1] + v.y * m[5] + v.z * m[9],
-			z: v.x * m[2] + v.y * m[6] + v.z * m[10],
-		};
-	}
-
 	multiply(m: number[]) {
-		this.matrix = multMatrixes(this.matrix, m);
+		this.matrix = multMatrixes(m, this.matrix);
 		return this;
-	}
-
-	translateR(vec: Vector3) {
-		return this.translate(this.applyExceptTranslation(vec));
 	}
 
 	translate(vec: Vector3) {
@@ -160,60 +142,12 @@ export class TransformMatrix {
 		return this;
 	}
 
-	scaleR(vec: Vector3) {
-		let originOffset = this.getOffsetFromOrigin();
-
-		this.multiply([
-			1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 0,
-			-originOffset.x, -originOffset.y, -originOffset.z, 1,
-		]);
-
-		// getScaleVector
-		// unscale
-		// unrotate (transpose matrix)
-
-		this.scale(vec);
-
-		this.multiply([
-			1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 0,
-			originOffset.x, originOffset.y, originOffset.z, 1,
-		]);
-
-		return this;
-	}
-
 	scale(vec: Vector3) {
-		this.matrix = multMatrixes([
+		this.multiply([
 			vec.x, 0, 0, 0,
 			0, vec.y, 0, 0,
 			0, 0, vec.z, 0,
 			0, 0, 0, 1,
-		], this.matrix);
-
-		return this;
-	}
-
-	rotateR(vec: Vector3, angle: number, relativeAxis: boolean = true) {
-		let originOffset = this.getOffsetFromOrigin();
-
-		this.multiply([
-			1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 0,
-			-originOffset.x, -originOffset.y, -originOffset.z, 1,
-		]);
-
-		this.rotate(relativeAxis ? this.applyExceptTranslation(vec) : vec, angle);
-
-		this.multiply([
-			1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 0,
-			originOffset.x, originOffset.y, originOffset.z, 1,
 		]);
 
 		return this;
@@ -373,12 +307,12 @@ export class Mesh {
 		this.transformMatrix = matr;
 
 		matr
-			.translateR(this.position)
-			.rotateR(vec3(1, 0, 0), this.rotation.x)
-			.rotateR(vec3(0, 1, 0), this.rotation.y)
-			.rotateR(vec3(0, 0, 1), this.rotation.z)
+			.translate(this.position)
+			.rotate(vec3(1, 0, 0), this.rotation.x)
+			.rotate(vec3(0, 1, 0), this.rotation.y)
+			.rotate(vec3(0, 0, 1), this.rotation.z)
 			.scale(this.scale)
-			.translateR(vecInvert(this.pivot));
+			.translate(vecInvert(this.pivot));
 
 		for (let el of this.elements) {
 			el.update();
