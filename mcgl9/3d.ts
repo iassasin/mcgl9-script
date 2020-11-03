@@ -1,8 +1,8 @@
-export function vec3(x: number, y: number, z: number) {
+export function vec3(x: number, y: number, z: number): Vector3 {
 	return {x, y, z};
 }
 
-export function vecMultVec(v1: Vector3, v2: Vector3) {
+export function vecMultVec(v1: Vector3, v2: Vector3): Vector3 {
 	return {
 		x: v1.x * v2.x,
 		y: v1.y * v2.y,
@@ -10,7 +10,15 @@ export function vecMultVec(v1: Vector3, v2: Vector3) {
 	};
 }
 
-export function vecAddVec(v1: Vector3, v2: Vector3) {
+export function vecMultVal(v: Vector3, val: number): Vector3 {
+	return {
+		x: v.x * val,
+		y: v.y * val,
+		z: v.z * val,
+	};
+}
+
+export function vecAddVec(v1: Vector3, v2: Vector3): Vector3 {
 	return {
 		x: v1.x + v2.x,
 		y: v1.y + v2.y,
@@ -18,7 +26,7 @@ export function vecAddVec(v1: Vector3, v2: Vector3) {
 	};
 }
 
-export function vecNormalize(v: Vector3) {
+export function vecNormalize(v: Vector3): Vector3 {
 	let len = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 	return {
 		x: v.x / len,
@@ -27,10 +35,45 @@ export function vecNormalize(v: Vector3) {
 	};
 }
 
+export function vecInvert(v: Vector3): Vector3 {
+	return vecMultVec(v, vec3(-1, -1, -1));
+}
+
 export interface Vector3 {
 	x: number;
 	y: number;
 	z: number;
+}
+
+function matrixToString(m: number[]) {
+	return `[${m[0]}\t${m[1]}\t${m[2]}\t${m[3]}]
+[${m[4]}\t${m[5]}\t${m[6]}\t${m[7]}]
+[${m[8]}\t${m[9]}\t${m[10]}\t${m[11]}]
+[${m[12]}\t${m[13]}\t${m[14]}\t${m[15]}]`;
+}
+
+function multMatrixes(s: number[], m: number[]): number[] {
+	return [
+		s[0] * m[0] + s[1] * m[4] + s[2] * m[8] +  s[3] * m[12],
+		s[0] * m[1] + s[1] * m[5] + s[2] * m[9] +  s[3] * m[13],
+		s[0] * m[2] + s[1] * m[6] + s[2] * m[10] + s[3] * m[14],
+		s[0] * m[3] + s[1] * m[7] + s[2] * m[11] + s[3] * m[15],
+
+		s[4] * m[0] + s[5] * m[4] + s[6] * m[8] +  s[7] * m[12],
+		s[4] * m[1] + s[5] * m[5] + s[6] * m[9] +  s[7] * m[13],
+		s[4] * m[2] + s[5] * m[6] + s[6] * m[10] + s[7] * m[14],
+		s[4] * m[3] + s[5] * m[7] + s[6] * m[11] + s[7] * m[15],
+
+		s[8] * m[0] + s[9] * m[4] + s[10] * m[8] +  s[11] * m[12],
+		s[8] * m[1] + s[9] * m[5] + s[10] * m[9] +  s[11] * m[13],
+		s[8] * m[2] + s[9] * m[6] + s[10] * m[10] + s[11] * m[14],
+		s[8] * m[3] + s[9] * m[7] + s[10] * m[11] + s[11] * m[15],
+
+		s[12] * m[0] + s[13] * m[4] + s[14] * m[8] +  s[15] * m[12],
+		s[12] * m[1] + s[13] * m[5] + s[14] * m[9] +  s[15] * m[13],
+		s[12] * m[2] + s[13] * m[6] + s[14] * m[10] + s[15] * m[14],
+		s[12] * m[3] + s[13] * m[7] + s[14] * m[11] + s[15] * m[15],
+	];
 }
 
 export class TransformMatrix {
@@ -48,6 +91,8 @@ export class TransformMatrix {
 		0, 0, 0, 1,
 	];
 
+	stack = [] as number[][];
+
 	getOffsetFromOrigin(): Vector3 {
 		return vec3(this.matrix[12], this.matrix[13], this.matrix[14]);
 	}
@@ -56,6 +101,21 @@ export class TransformMatrix {
 		let mat = new TransformMatrix();
 		mat.matrix = this.matrix.map(x => x);
 		return mat;
+	}
+
+	push() {
+		this.stack.push(this.matrix.map(x => x));
+		return this;
+	}
+
+	pop() {
+		if (this.stack.length > 0) {
+			this.matrix = this.stack.pop();
+		} else {
+			throw new Error('Matrix stack is empty');
+		}
+
+		return this;
 	}
 
 	apply(v: Vector3): Vector3 {
@@ -79,34 +139,15 @@ export class TransformMatrix {
 	}
 
 	multiply(m: number[]) {
-		const s = this.matrix;
+		this.matrix = multMatrixes(this.matrix, m);
+		return this;
+	}
 
-		this.matrix = [
-			s[0] * m[0] + s[1] * m[4] + s[2] * m[8] +  s[3] * m[12],
-			s[0] * m[1] + s[1] * m[5] + s[2] * m[9] +  s[3] * m[13],
-			s[0] * m[2] + s[1] * m[6] + s[2] * m[10] + s[3] * m[14],
-			s[0] * m[3] + s[1] * m[7] + s[2] * m[11] + s[3] * m[15],
-
-			s[4] * m[0] + s[5] * m[4] + s[6] * m[8] +  s[7] * m[12],
-			s[4] * m[1] + s[5] * m[5] + s[6] * m[9] +  s[7] * m[13],
-			s[4] * m[2] + s[5] * m[6] + s[6] * m[10] + s[7] * m[14],
-			s[4] * m[3] + s[5] * m[7] + s[6] * m[11] + s[7] * m[15],
-
-			s[8] * m[0] + s[9] * m[4] + s[10] * m[8] +  s[11] * m[12],
-			s[8] * m[1] + s[9] * m[5] + s[10] * m[9] +  s[11] * m[13],
-			s[8] * m[2] + s[9] * m[6] + s[10] * m[10] + s[11] * m[14],
-			s[8] * m[3] + s[9] * m[7] + s[10] * m[11] + s[11] * m[15],
-
-			s[12] * m[0] + s[13] * m[4] + s[14] * m[8] +  s[15] * m[12],
-			s[12] * m[1] + s[13] * m[5] + s[14] * m[9] +  s[15] * m[13],
-			s[12] * m[2] + s[13] * m[6] + s[14] * m[10] + s[15] * m[14],
-			s[12] * m[3] + s[13] * m[7] + s[14] * m[11] + s[15] * m[15],
-		];
+	translateR(vec: Vector3) {
+		return this.translate(this.applyExceptTranslation(vec));
 	}
 
 	translate(vec: Vector3) {
-		vec = this.applyExceptTranslation(vec);
-
 		// https://medium.com/swlh/understanding-3d-matrix-transforms-with-pixijs-c76da3f8bd8
 		// https://en.wikipedia.org/wiki/Affine_transformation
 		this.multiply([
@@ -119,7 +160,7 @@ export class TransformMatrix {
 		return this;
 	}
 
-	scale(vec: Vector3) {
+	scaleR(vec: Vector3) {
 		let originOffset = this.getOffsetFromOrigin();
 
 		this.multiply([
@@ -129,12 +170,44 @@ export class TransformMatrix {
 			-originOffset.x, -originOffset.y, -originOffset.z, 1,
 		]);
 
+		// getScaleVector
+		// unscale
+		// unrotate (transpose matrix)
+
+		this.scale(vec);
+
 		this.multiply([
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			originOffset.x, originOffset.y, originOffset.z, 1,
+		]);
+
+		return this;
+	}
+
+	scale(vec: Vector3) {
+		this.matrix = multMatrixes([
 			vec.x, 0, 0, 0,
 			0, vec.y, 0, 0,
 			0, 0, vec.z, 0,
 			0, 0, 0, 1,
+		], this.matrix);
+
+		return this;
+	}
+
+	rotateR(vec: Vector3, angle: number, relativeAxis: boolean = true) {
+		let originOffset = this.getOffsetFromOrigin();
+
+		this.multiply([
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			-originOffset.x, -originOffset.y, -originOffset.z, 1,
 		]);
+
+		this.rotate(relativeAxis ? this.applyExceptTranslation(vec) : vec, angle);
 
 		this.multiply([
 			1, 0, 0, 0,
@@ -152,42 +225,25 @@ export class TransformMatrix {
 		const sinA = Math.sin(angle);
 		const iCosA = 1 - cosA;
 
-		let originOffset = this.getOffsetFromOrigin();
+		vec = vecNormalize(vec);
 
-		this.multiply([
-			1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 0,
-			-originOffset.x, -originOffset.y, -originOffset.z, 1,
-		]);
-
-		vec = vecNormalize(this.apply(vec));
-
-		// https://en.wikipedia.org/wiki/Rotation_matrix
 		this.multiply([
 			cosA + vec.x * vec.x * iCosA,
-			vec.x * vec.y * iCosA - vec.z * sinA,
-			vec.x * vec.z * iCosA + vec.y * sinA,
-			0,
-
 			vec.y * vec.x * iCosA + vec.z * sinA,
-			cosA + vec.y * vec.y * iCosA,
-			vec.y * vec.z * iCosA - vec.x * sinA,
+			vec.z * vec.x * iCosA - vec.y * sinA,
 			0,
 
-			vec.z * vec.x * iCosA - vec.y * sinA,
+			vec.x * vec.y * iCosA - vec.z * sinA,
+			cosA + vec.y * vec.y * iCosA,
 			vec.z * vec.y * iCosA + vec.x * sinA,
+			0,
+
+			vec.x * vec.z * iCosA + vec.y * sinA,
+			vec.y * vec.z * iCosA - vec.x * sinA,
 			cosA + vec.z * vec.z * iCosA,
 			0,
 
 			0, 0, 0, 1,
-		]);
-
-		this.multiply([
-			1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 0,
-			originOffset.x, originOffset.y, originOffset.z, 1,
 		]);
 
 		return this;
@@ -317,12 +373,12 @@ export class Mesh {
 		this.transformMatrix = matr;
 
 		matr
-			.translate(this.position)
-			.rotate(vec3(1, 0, 0), this.rotation.x)
-			.rotate(vec3(0, 1, 0), this.rotation.y)
-			.rotate(vec3(0, 0, 1), this.rotation.z)
+			.translateR(this.position)
+			.rotateR(vec3(1, 0, 0), this.rotation.x)
+			.rotateR(vec3(0, 1, 0), this.rotation.y)
+			.rotateR(vec3(0, 0, 1), this.rotation.z)
 			.scale(this.scale)
-			.translate(vecMultVec(this.pivot, vec3(-1, -1, -1)));
+			.translateR(vecInvert(this.pivot));
 
 		for (let el of this.elements) {
 			el.update();
