@@ -7,6 +7,10 @@ function matrixToString(m: number[]) {
 [${m[12]}\t${m[13]}\t${m[14]}\t${m[15]}]`;
 }
 
+export function degToRad(deg: number) {
+	return deg / 180 * Math.PI;
+}
+
 function multMatrixes(s: number[], m: number[]): number[] {
 	return [
 		s[0] * m[0] + s[1] * m[4] + s[2] * m[8] +  s[3] * m[12],
@@ -109,7 +113,7 @@ export class TransformMatrix {
 	}
 
 	rotate(vec: Vector3, angle: number) {
-		angle = angle / 360 * 6.283;
+		angle = degToRad(angle);
 		const cosA = Math.cos(angle);
 		const sinA = Math.sin(angle);
 		const iCosA = 1 - cosA;
@@ -130,6 +134,40 @@ export class TransformMatrix {
 			vec.x * vec.z * iCosA + vec.y * sinA,
 			vec.y * vec.z * iCosA - vec.x * sinA,
 			cosA + vec.z * vec.z * iCosA,
+			0,
+
+			0, 0, 0, 1,
+		]);
+
+		return this;
+	}
+
+	rotate3(angles: Vector3) {
+		const ax = degToRad(angles.x);
+		const ay = degToRad(angles.y);
+		const az = degToRad(angles.z);
+
+		const sinY = Math.sin(ay);
+		const cosY = Math.cos(ay);
+		const sinX = Math.sin(ax);
+		const cosX = Math.cos(ax);
+		const sinZ = Math.sin(az);
+		const cosZ = Math.cos(az);
+
+		this.multiply([
+			cosZ * cosY,
+			sinZ * cosY,
+			-sinY,
+			0,
+
+			cosZ * sinY * sinX - sinZ * cosX,
+			sinZ * sinY * sinX + cosZ * cosX,
+			cosY * sinX,
+			0,
+
+			cosZ * sinY * cosX + sinZ * sinX,
+			sinZ * sinY * cosX - cosZ * sinX,
+			cosY * cosX,
 			0,
 
 			0, 0, 0, 1,

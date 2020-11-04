@@ -22,11 +22,10 @@ export class Mesh extends Transform {
 		matrix
 			.push()
 			.translate(this.position)
-			.rotate(vec3(1, 0, 0), this.rotation.x)
-			.rotate(vec3(0, 1, 0), this.rotation.y)
-			.rotate(vec3(0, 0, 1), this.rotation.z)
+			.rotate3(this.rotation)
 			.scale(this.scale)
-			.translate(vecInvert(this.pivot));
+			.translate(vecInvert(this.pivot))
+			;
 
 		for (let el of this.elements) {
 			el.update(matrix);
