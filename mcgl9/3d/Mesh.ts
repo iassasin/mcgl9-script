@@ -20,18 +20,13 @@ export class Mesh extends Transform {
 
 	update(matrix: TransformMatrix) {
 		matrix
-			.push()
 			.translate(this.position)
 			.rotate3(this.rotation)
 			.scale(this.scale)
 			.translate(vecInvert(this.pivot))
 			;
 
-		for (let el of this.elements) {
-			el.update(matrix);
-		}
-
-		matrix.pop();
+		super.update(matrix);
 	}
 }
 

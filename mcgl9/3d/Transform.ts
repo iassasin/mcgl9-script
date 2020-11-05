@@ -5,18 +5,23 @@ export type TransformerFunction = (matrix: TransformMatrix) => void;
 export function createCustomTransform(update: TransformerFunction) {
 	return new class extends Transform {
 		update(matrix: TransformMatrix) {
+			matrix.push();
 			update(matrix);
 			super.update(matrix);
+			matrix.pop();
 		}
 	}
 }
 
 export class Transform {
+	enabled = true;
 	elements = [] as Transform[];
 
 	update(matrix: TransformMatrix) {
-		for (let el of this.elements) {
-			el.update(matrix);
+		if (this.enabled) {
+			for (let el of this.elements) {
+				el.update(matrix);
+			}
 		}
 	}
 
