@@ -19,7 +19,12 @@ export class Mesh extends Transform {
 	}
 
 	update(matrix: TransformMatrix) {
+		if (!this.enabled) {
+			return;
+		}
+
 		matrix
+			.push()
 			.translate(this.position)
 			.rotate3(this.rotation)
 			.scale(this.scale)
@@ -27,20 +32,14 @@ export class Mesh extends Transform {
 			;
 
 		super.update(matrix);
+
+		matrix.pop();
 	}
 }
 
 export function createMeshFromTemplate(template: string, objectFabric?: (point: string, x: number, y: number, mesh: Mesh) => Transform) {
 	if (!(objectFabric && objectFabric instanceof Function)) {
-		objectFabric = point => {
-			switch (point) {
-				case '.':
-				case ' ': return null;
-
-				default:
-					return new Voxel();
-			}
-		}
+		objectFabric = point => point !== '.' && point !== ' ' && new Voxel();
 	}
 
 	let mesh = new Mesh();
