@@ -19,11 +19,19 @@ oo..oooooooo..oo
 oo..oooooooo..oo
 o..............o
 `;
+// символ 'p' в середине ракеты имеет особое значение: это pivot, т.е. точка поворота или центр объекта
 
+// создаем сцену, на которой будем размещать объекты
 let scene = new Scene();
+// Передвинем центр сцены в центр блока над проектором
+scene.position = vec3(8, 0, 8);
 
+// создаем экземпляр ракеты по шаблону
 let rocket = createMeshFromTemplate(rocketModel);
-rocket.position = vec3(8, 8, 8);
+// подвинем ракету в середину текущего блока
+// работает относительно центра родительского объекта, в данном случае сцены
+rocket.position = vec3(0, 8, 0);
+// добавляем ракету на сцену
 scene.addElement(rocket);
 
 mcgl9.onUpdate(time => {
@@ -31,5 +39,6 @@ mcgl9.onUpdate(time => {
 
 	rocket.rotation.z = Math.sin(rot) * 30;
 
+	// Важно: всегда должен идти в конце onUpdate. Пересчитывает все объекты и обновляет воксели
 	scene.update();
 });
