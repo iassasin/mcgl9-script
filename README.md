@@ -26,9 +26,7 @@
 import mcgl9 from './mcgl9';
 import {setInterval} from './mcgl9/timers'; // используемые модули
 
-mcgl9.onInit(() => {
-	display.size(1, 1);
-});
+display.size(1, 1);
 
 setInterval(() => display.print('hello'), 1000);
 ```
@@ -56,7 +54,7 @@ npm run watch
 import mcgl9 from './mcgl9';
 
 mcgl9.onInit(() => {
-	// аналог функции init() из документации MCGL
+	// аналог функции init() из документации MCGL, использовать не обязательно
 });
 
 mcgl9.onUpdate((time) => {
