@@ -54,9 +54,7 @@ npm run watch
 ```ts
 import mcgl9 from './mcgl9';
 
-mcgl9.onInit(() => {
-	// аналог функции init() из документации MCGL, использовать не обязательно
-});
+// инициализация (аналог функции init() из документации MCGL)
 
 mcgl9.onUpdate((time) => {
 	// аналог функции update(time) из документации MCGL

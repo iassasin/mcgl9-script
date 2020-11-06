@@ -1,4 +1,3 @@
-let inits = [] as Function[];
 let updates = [] as Function[];
 
 export function applier<T extends Function>(arr: T[]) {
@@ -9,14 +8,10 @@ export function applier<T extends Function>(arr: T[]) {
 	} as (...args: any[]) => any;
 }
 
-init = applier(inits);
+init = (applier as () => () => void)();
 update = applier(updates);
 
 export default {
-	onInit(cb: () => any) {
-		inits.push(cb);
-	},
-
 	onUpdate(cb: (time: number) => any) {
 		updates.push(cb);
 	},

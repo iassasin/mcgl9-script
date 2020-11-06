@@ -3,15 +3,13 @@ import keyboard from '../mcgl9/keyboard';
 
 let lines: Operation[] = [null, null, null];
 
-mcgl9.onInit(() => {
-	display.size(1, 1);
-	display.color(color.rgbf(1, 1, 1));
+display.size(1, 1);
+display.color(color.rgbf(1, 1, 1));
 
-	for (let i = 0; i < 3; ++i) {
-		display.cursor(0, 2 * i);
-		lines[i] = display.print('');
-	}
-});
+for (let i = 0; i < 3; ++i) {
+	display.cursor(0, 2 * i);
+	lines[i] = display.print('');
+}
 
 let ctr = [0, 0, 0];
 
