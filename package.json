@@ -11,6 +11,7 @@
   "scripts": {
     "build": "rollup -c",
     "build-mini": "cross-env MINI=1 rollup -c",
+    "build-3d": "cross-env TARGET=3d npm run build-mini",
     "watch": "cross-env WATCH=1 rollup -wc"
   }
 }
