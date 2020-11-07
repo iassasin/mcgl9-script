@@ -14,18 +14,21 @@ export function createCustomTransform(update: TransformerFunction) {
 }
 
 export class Transform {
-	enabled = true;
 	elements = [] as Transform[];
 
 	update(matrix: TransformMatrix) {
-		if (this.enabled) {
-			for (let el of this.elements) {
-				el.update(matrix);
-			}
+		for (let el of this.elements) {
+			el.update(matrix);
 		}
 	}
 
 	addElement(el: Transform) {
 		this.elements.push(el);
+	}
+
+	destroy() {
+		for (let el of this.elements) {
+			el.destroy();
+		}
 	}
 }

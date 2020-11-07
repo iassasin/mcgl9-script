@@ -19,10 +19,6 @@ export class Mesh extends Transform {
 	}
 
 	update(matrix: TransformMatrix) {
-		if (!this.enabled) {
-			return;
-		}
-
 		matrix
 			.push()
 			.translate(this.position)
