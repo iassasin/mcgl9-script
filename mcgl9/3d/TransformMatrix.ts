@@ -1,3 +1,4 @@
+import { ColorMask } from './Color';
 import {Vector3, vecNormalize} from './Vector';
 
 function matrixToString(m: number[]) {
@@ -35,6 +36,10 @@ function multMatrixes(s: number[], m: number[]): number[] {
 	];
 }
 
+function copyFunc<T>(x: T) {
+	return x;
+}
+
 export class TransformMatrix {
 	/**
 	 * indexes:
@@ -50,22 +55,31 @@ export class TransformMatrix {
 		0, 0, 0, 1,
 	];
 
+	/**
+	 * [r, g, b, a]
+	 */
+	colorMask = [1, 1, 1, 1];
+
 	stack = [] as number[][];
+	colorStack = [] as number[][];
 
 	copy() {
 		let mat = new TransformMatrix();
-		mat.matrix = this.matrix.map(x => x);
+		mat.matrix = this.matrix.map(copyFunc);
+		mat.colorMask = this.colorMask.map(copyFunc);
 		return mat;
 	}
 
 	push() {
-		this.stack.push(this.matrix.map(x => x));
+		this.stack.push(this.matrix.map(copyFunc));
+		this.colorStack.push(this.colorMask.map(copyFunc));
 		return this;
 	}
 
 	pop() {
 		if (this.stack.length > 0) {
 			this.matrix = this.stack.pop();
+			this.colorMask = this.colorStack.pop();
 		} else {
 			throw new Error('Matrix stack is empty');
 		}
@@ -81,6 +95,21 @@ export class TransformMatrix {
 			y: v.x * m[1] + v.y * m[5] + v.z * m[9] + m[13],
 			z: v.x * m[2] + v.y * m[6] + v.z * m[10] + m[14],
 		};
+	}
+
+	applyColor(color: number): number {
+		const ff = 255;
+		const mask = this.colorMask;
+
+		return ((color & ff) * mask[0])
+			| ((color >> 8 & ff) * mask[1]) << 8
+			| ((color >> 16 & ff) * mask[2]) << 16
+			| ((color >> 24 & ff) * mask[3]) << 24;
+	}
+
+	color(colorMask: ColorMask) {
+		this.colorMask = [colorMask.r, colorMask.g, colorMask.b, colorMask.a];
+		return this;
 	}
 
 	multiply(m: number[]) {

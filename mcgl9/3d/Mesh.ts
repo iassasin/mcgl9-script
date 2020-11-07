@@ -1,3 +1,4 @@
+import { colorMask, ColorMask } from './Color';
 import { Transform } from './Transform';
 import { TransformMatrix } from './TransformMatrix';
 import { Vector3, vec3, vecInvert } from './Vector';
@@ -8,6 +9,7 @@ export class Mesh extends Transform {
 	pivot: Vector3;
 	rotation: Vector3;
 	scale: Vector3;
+	color: ColorMask;
 
 	constructor() {
 		super();
@@ -16,6 +18,7 @@ export class Mesh extends Transform {
 		this.pivot = vec3(0, 0, 0);
 		this.rotation = vec3(0, 0, 0);
 		this.scale = vec3(1, 1, 1);
+		this.color = colorMask(1, 1, 1, 1);
 	}
 
 	update(matrix: TransformMatrix) {
@@ -25,6 +28,7 @@ export class Mesh extends Transform {
 			.rotate3(this.rotation)
 			.scale(this.scale)
 			.translate(vecInvert(this.pivot))
+			.color(this.color)
 			;
 
 		super.update(matrix);

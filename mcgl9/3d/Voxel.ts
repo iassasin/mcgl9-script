@@ -1,4 +1,5 @@
 import { Transform } from './Transform';
+import { TransformMatrix } from './TransformMatrix';
 import { Vector3, vec3 } from './Vector';
 
 interface VoxelProps {
@@ -17,7 +18,7 @@ export class Voxel extends Transform {
 	constructor(props?: VoxelProps) {
 		super();
 
-		let rprops = {position: vec3(0, 0, 0), color: color.rgb(0, 0, 0), size: 1};
+		let rprops = {position: vec3(0, 0, 0), color: color.rgbf(1, 1, 1), size: 1};
 		if (props) {
 			for (let k in props) {
 				rprops[k] = props[k];
@@ -31,10 +32,10 @@ export class Voxel extends Transform {
 		this.voxel = display.voxel(rprops.position.x, rprops.position.y, rprops.position.z, this.color);
 	}
 
-	update(matrix) {
+	update(matrix: TransformMatrix) {
 		let pos = matrix.apply(this.position);
 
-		this.voxel.color = this.color;
+		this.voxel.color = matrix.applyColor(this.color);
 		this.voxel.scale = this.size;
 		this.voxel.cursorX = pos.x;
 		this.voxel.cursorY = pos.y;

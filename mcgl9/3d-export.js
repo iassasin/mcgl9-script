@@ -13,3 +13,4 @@ vecAddVec = td.vecAddVec;
 vecInvert = td.vecInvert;
 vecMultVal = td.vecMultVal;
 vecNormalize = td.vecNormalize;
+colorMask = td.colorMask;
