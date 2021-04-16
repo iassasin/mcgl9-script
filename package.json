@@ -2,6 +2,7 @@
   "devDependencies": {
     "@rollup/plugin-typescript": "^6.1.0",
     "cross-env": "^7.0.2",
+    "lz-string": "1.4.4",
     "rollup": "^2.33.1",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-uglify": "^6.0.4",
@@ -11,7 +12,9 @@
   "scripts": {
     "build": "rollup -c",
     "build-mini": "cross-env MINI=1 rollup -c",
+    "build-compressed": "npm run build-mini && node helpers/gen-compressed.js dist/script.js dist/script.js",
     "build-3d": "cross-env TARGET=3d npm run build-mini",
+    "build-3d-compressed": "npm run build-3d && node helpers/gen-compressed.js dist/3d.js dist/3d.js",
     "watch": "cross-env WATCH=1 rollup -wc"
   }
 }
