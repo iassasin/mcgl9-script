@@ -5,19 +5,19 @@ function (input) {
         numBits = 3,
         entry = "",
         result = [],
-		f = String.fromCharCode,
-		mpow = Math.pow,
+        f = String.fromCharCode,
+        mpow = Math.pow,
         w,
         bits, power,
         c,
-        value = (value = input.charCodeAt(0),value > 92 ? value - 59 : value - 58),
+        value = (value = input.charCodeAt(0), value > 92 ? value - 59 : value - 58),
 		pos = 32,
 		idx = 1;
 
     var readBits = function(pow) {
       bits = 0;
       power=1;
-      while (power!=mpow(2,pow)) {
+      while (power != mpow(2,pow)) {
         bits |= ((value & pos) > 0 ? 1 : 0) * power;
         power <<= 1;
         pos >>= 1;
@@ -105,7 +105,7 @@ function (input) {
         entry = dictionary[c];
       } else {
         if (c === dictSize) {
-          entry = w + w.charAt(0);
+          entry = w + w[0];
         }/* else {
           return null;
         }*/
@@ -113,7 +113,7 @@ function (input) {
       result.push(entry);
 
       // Add w+entry[0] to the dictionary.
-      dictionary[dictSize++] = w + entry.charAt(0);
+      dictionary[dictSize++] = w + entry[0];
       enlargeIn--;
 
       w = entry;
