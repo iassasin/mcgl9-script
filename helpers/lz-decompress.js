@@ -6,32 +6,32 @@ function (input) {
         entry = "",
         result = [],
 		f = String.fromCharCode,
-        i,
+		mpow = Math.pow,
         w,
-        bits, resb, maxpower, power,
+        bits, power,
         c,
-        data = {v:(i = input.charCodeAt(0),i > 92 ? i - 59 : i - 58), p:32, i:1};
+        value = (value = input.charCodeAt(0),value > 92 ? value - 59 : value - 58),
+		pos = 32,
+		idx = 1;
 
-    var iteratePower = function(pow) {
+    var readBits = function(pow) {
       bits = 0;
-      maxpower = Math.pow(2,pow);
       power=1;
-      while (power!=maxpower) {
-        resb = data.v & data.p;
-        data.p >>= 1;
-        if (data.p == 0) {
-          data.p = 32;
-          data.v = (i = input.charCodeAt(data.i++), i > 92 ? i - 59 : i - 58);
+      while (power!=mpow(2,pow)) {
+        bits |= ((value & pos) > 0 ? 1 : 0) * power;
+        power <<= 1;
+        pos >>= 1;
+        if (pos == 0) {
+          pos = 32;
+          value = (value = input.charCodeAt(idx++), value > 92 ? value - 59 : value - 58);
           // : = 58
           // \ = 92
         }
-        bits |= (resb>0 ? 1 : 0) * power;
-        power <<= 1;
       }
     };
 
-    iteratePower(2);
-    iteratePower(bits*8+8);
+    readBits(2);
+    readBits(bits*8+8);
     c = f(bits);
 
     /*
@@ -55,19 +55,19 @@ function (input) {
     result.push(c);
     while (true) {
       /*
-      if (data.i > input.length) {
+      if (idx > input.length) {
         return "";
       }
       */
 
-      iteratePower(numBits);
+      readBits(numBits);
 
       if (bits == 2) {
         return result.join('');
       }
 
       if ((c=bits) < 2 && bits >= 0) {
-        iteratePower(bits*8+8);
+        readBits(bits*8+8);
         dictionary[dictSize++] = f(bits);
         c = dictSize-1;
         enlargeIn--;
@@ -97,7 +97,7 @@ function (input) {
 
 
       if (enlargeIn == 0) {
-        enlargeIn = Math.pow(2, numBits);
+        enlargeIn = mpow(2, numBits);
         numBits++;
       }
 
@@ -119,7 +119,7 @@ function (input) {
       w = entry;
 
       if (enlargeIn == 0) {
-        enlargeIn = Math.pow(2, numBits);
+        enlargeIn = mpow(2, numBits);
         numBits++;
       }
 
