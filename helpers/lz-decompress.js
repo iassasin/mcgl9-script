@@ -10,23 +10,24 @@ function (input) {
         w,
         bits, power,
         c,
-        value = (value = input.charCodeAt(0), value > 92 ? value - 59 : value - 58),
-		pos = 32,
-		idx = 1;
+        value,
+        pos = 0,
+        idx = 0;
 
     var readBits = function(pow) {
       bits = 0;
       power=1;
       while (power != mpow(2,pow)) {
-        bits |= ((value & pos) > 0 ? 1 : 0) * power;
-        power <<= 1;
-        pos >>= 1;
         if (pos == 0) {
           pos = 32;
           value = (value = input.charCodeAt(idx++), value > 92 ? value - 59 : value - 58);
           // : = 58
           // \ = 92
         }
+
+        bits |= ((value & pos) > 0 ? 1 : 0) * power;
+        power <<= 1;
+        pos >>= 1;
       }
     };
 
