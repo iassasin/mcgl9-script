@@ -16,8 +16,8 @@ function (input) {
 
     var readBits = function(pow) {
       bits = 0;
-      power=1;
-      while (power != mpow(2,pow)) {
+      power=0;
+      while (power < pow) {
         if (pos == 0) {
           pos = 32;
           value = (value = input.charCodeAt(idx++), value > 92 ? value - 59 : value - 58);
@@ -25,8 +25,8 @@ function (input) {
           // \ = 92
         }
 
-        bits |= ((value & pos) > 0 ? 1 : 0) * power;
-        power <<= 1;
+        bits |= ((value & pos) > 0 ? 1 : 0) << power;
+        ++power;
         pos >>= 1;
       }
     };
@@ -67,11 +67,16 @@ function (input) {
         return result.join('');
       }
 
-      if ((c=bits) < 2 && bits >= 0) {
+      // actually, array contents doesnt matter, all we need is indexes 0,1
+      if ((c=bits) in [0,1]) {
         readBits(bits*8+8);
         dictionary[dictSize++] = f(bits);
         c = dictSize-1;
-        enlargeIn--;
+
+        if (!--enlargeIn) {
+          enlargeIn = mpow(2, numBits);
+          numBits++;
+        }
       }
 
 
@@ -96,12 +101,6 @@ function (input) {
       }
       */
 
-
-      if (enlargeIn == 0) {
-        enlargeIn = mpow(2, numBits);
-        numBits++;
-      }
-
       if (dictionary[c]) {
         entry = dictionary[c];
       } else {
@@ -115,11 +114,9 @@ function (input) {
 
       // Add w+entry[0] to the dictionary.
       dictionary[dictSize++] = w + entry[0];
-      enlargeIn--;
-
       w = entry;
 
-      if (enlargeIn == 0) {
+      if (!--enlargeIn) {
         enlargeIn = mpow(2, numBits);
         numBits++;
       }
