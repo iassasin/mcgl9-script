@@ -57,9 +57,9 @@ function (input) {
 
       if (dictionary[c]) {
         entry = dictionary[c];
-      } else if (c === dictSize) {
+      } else { // c !== dictSize => return null
         entry = w + w[0];
-      } // else return null
+      }
       result.push(entry);
 
       dictionary[dictSize++] = w + entry[0];
