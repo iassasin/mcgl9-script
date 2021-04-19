@@ -2,11 +2,10 @@ function (input) {
     var dictionary = [0, 1, 2],
         enlargeIn = 4,
         dictSize = 4,
-        numBits = 3,
+        numBits = 2,
         entry = "",
         result = [],
         f = String.fromCharCode,
-        mpow = Math.pow,
         w,
         bits, power,
         c,
@@ -61,7 +60,7 @@ function (input) {
       }
       */
 
-      readBits(numBits);
+      readBits(numBits+1);
 
       if (bits == 2) {
         return result.join('');
@@ -74,7 +73,7 @@ function (input) {
         c = dictSize-1;
 
         if (!--enlargeIn) {
-          enlargeIn = mpow(2, numBits);
+          enlargeIn = 2 << numBits;
           numBits++;
         }
       }
@@ -117,7 +116,7 @@ function (input) {
       w = entry;
 
       if (!--enlargeIn) {
-        enlargeIn = mpow(2, numBits);
+        enlargeIn = 2 << numBits;
         numBits++;
       }
 
