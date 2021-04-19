@@ -1,8 +1,8 @@
 function (input) {
     var dictionary = [0, 1, 2],
-        enlargeIn = 4,
-        dictSize = 4,
-        numBits = 2,
+        enlargeIn = 1,
+        dictSize = 3,
+        numBits = 1,
         entry = "",
         result = [],
         f = String.fromCharCode,
@@ -30,13 +30,6 @@ function (input) {
       }
     };
 
-    readBits(2);
-    readBits(bits*8+8);
-    c = f(bits);
-
-    dictionary[3] = c;
-    w = c;
-    result.push(c);
     while (true) { // idx > input.length => return ""
       readBits(numBits+1);
 
@@ -47,8 +40,7 @@ function (input) {
       // actually, array contents doesnt matter, all we need is indexes 0,1
       if ((c=bits) in [0,1]) {
         readBits(bits*8+8);
-        dictionary[dictSize++] = f(bits);
-        c = dictSize-1;
+        dictionary[c = dictSize++] = f(bits);
 
         if (!--enlargeIn) {
           enlargeIn = 2 << numBits++;
@@ -62,12 +54,14 @@ function (input) {
       }
       result.push(entry);
 
-      dictionary[dictSize++] = w + entry[0];
-      w = entry;
+      if (w) {
+        dictionary[dictSize++] = w + entry[0];
 
-      if (!--enlargeIn) {
-        enlargeIn = 2 << numBits++;
+        if (!--enlargeIn) {
+          enlargeIn = 2 << numBits++;
+        }
       }
 
+      w = entry;
     }
   }
