@@ -73,8 +73,7 @@ function (input) {
         c = dictSize-1;
 
         if (!--enlargeIn) {
-          enlargeIn = 2 << numBits;
-          numBits++;
+          enlargeIn = 2 << numBits++;
         }
       }
 
@@ -116,8 +115,7 @@ function (input) {
       w = entry;
 
       if (!--enlargeIn) {
-        enlargeIn = 2 << numBits;
-        numBits++;
+        enlargeIn = 2 << numBits++;
       }
 
     }
