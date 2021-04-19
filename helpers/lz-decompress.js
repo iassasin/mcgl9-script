@@ -1,32 +1,31 @@
 function (input) {
-    var dictionary = [0, 1, 2],
+    var dictionary = [],
         enlargeIn = 1,
         dictSize = 3,
         numBits = 1,
-        entry = "",
+        entry,
         result = [],
-        f = String.fromCharCode,
-        w,
-        bits, power,
-        c,
+        lastEntry,
+        bits, bitPos,
+        currentChar,
         value,
         pos = 0,
         idx = 0;
 
     var readBits = function(pow) {
       bits = 0;
-      power=0;
-      while (power < pow) {
-        if (pos == 0) {
-          pos = 32;
+      bitPos = 0;
+      while (bitPos < pow) {
+        if (pos < 2) {
+          pos = 64;
           value = (value = input.charCodeAt(idx++), value > 92 ? value - 59 : value - 58);
           // : = 58
           // \ = 92
         }
 
-        bits |= ((value & pos) > 0 ? 1 : 0) << power;
-        ++power;
-        pos >>= 1;
+        pos /= 2;
+        bits |= ((value & pos) > 0 ? 1 : 0) << bitPos;
+        ++bitPos;
       }
     };
 
@@ -37,31 +36,26 @@ function (input) {
         return result.join('');
       }
 
-      // actually, array contents doesnt matter, all we need is indexes 0,1
-      if ((c=bits) in [0,1]) {
+      // check if bits is 0 or 1
+      if (!((currentChar = bits) & ~1)) {
         readBits(bits*8+8);
-        dictionary[c = dictSize++] = f(bits);
+        dictionary[currentChar = dictSize++] = String.fromCharCode(bits);
 
         if (!--enlargeIn) {
           enlargeIn = 2 << numBits++;
         }
       }
 
-      if (dictionary[c]) {
-        entry = dictionary[c];
-      } else { // c !== dictSize => return null
-        entry = w + w[0];
-      }
-      result.push(entry);
+      result.push(entry = dictionary[currentChar] || lastEntry + lastEntry[0]);
 
-      if (w) {
-        dictionary[dictSize++] = w + entry[0];
+      if (lastEntry) {
+        dictionary[dictSize++] = lastEntry + entry[0];
 
         if (!--enlargeIn) {
           enlargeIn = 2 << numBits++;
         }
       }
 
-      w = entry;
+      lastEntry = entry;
     }
   }
