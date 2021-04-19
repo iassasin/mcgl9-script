@@ -34,32 +34,10 @@ function (input) {
     readBits(bits*8+8);
     c = f(bits);
 
-    /*
-    // was:
-    switch (bits) {
-      case 0:
-        iteratePower(8);
-        c = f(bits);
-        break;
-      case 1:
-        iteratePower(16);
-        c = f(bits);
-        break;
-      case 2:
-        return "";
-    }
-    */
-
     dictionary[3] = c;
     w = c;
     result.push(c);
-    while (true) {
-      /*
-      if (idx > input.length) {
-        return "";
-      }
-      */
-
+    while (true) { // idx > input.length => return ""
       readBits(numBits+1);
 
       if (bits == 2) {
@@ -77,40 +55,13 @@ function (input) {
         }
       }
 
-
-      /*
-      // was:
-      switch (c = bits) {
-        case 0:
-          iteratePower(8);
-
-          dictionary[dictSize++] = f(bits);
-          c = dictSize-1;
-          enlargeIn--;
-          break;
-        case 1:
-          iteratePower(16);
-          dictionary[dictSize++] = f(bits);
-          c = dictSize-1;
-          enlargeIn--;
-          break;
-        case 2:
-          return result.join('');
-      }
-      */
-
       if (dictionary[c]) {
         entry = dictionary[c];
-      } else {
-        if (c === dictSize) {
-          entry = w + w[0];
-        }/* else {
-          return null;
-        }*/
-      }
+      } else if (c === dictSize) {
+        entry = w + w[0];
+      } // else return null
       result.push(entry);
 
-      // Add w+entry[0] to the dictionary.
       dictionary[dictSize++] = w + entry[0];
       w = entry;
 
