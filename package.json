@@ -12,9 +12,9 @@
   "scripts": {
     "build": "rollup -c",
     "build-mini": "cross-env MINI=1 rollup -c",
-    "build-compressed": "npm run build-mini && node helpers/gen-compressed.js dist/script.js dist/script.js",
+    "build-compressed": "cross-env MINI=2 rollup -c && node helpers/gen-compressed.js dist/script.js dist/script.js",
     "build-3d": "cross-env TARGET=3d npm run build-mini",
-    "build-3d-compressed": "npm run build-3d && node helpers/gen-compressed.js dist/3d.js dist/3d.js",
+    "build-3d-compressed": "cross-env TARGET=3d MINI=2 rollup -c && node helpers/gen-compressed.js dist/3d.js dist/3d.js",
     "watch": "cross-env WATCH=1 rollup -wc"
   }
 }

@@ -3,6 +3,7 @@ import resolve from 'rollup-plugin-node-resolve';
 import { uglify } from "rollup-plugin-uglify";
 
 const mini = process.env.MINI === '1';
+const veryMini = process.env.MINI === '2';
 const watch = process.env.WATCH === '1';
 const target = process.env.TARGET || 'script';
 const allTargets = target === 'all';
@@ -21,14 +22,14 @@ function createConfig() {
     typescript(),
   ];
 
-  if (mini) {
+  if (mini || veryMini) {
     plugins.push(uglify({
       compress: {
         passes: 3,
       },
 
       output: {
-        max_line_len: 128,
+        max_line_len: veryMini ? undefined : 128,
       },
     }));
   }
